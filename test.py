@@ -1,62 +1,3 @@
-# import json
-# import psycopg2
-# import paho.mqtt.client as mqtt
-
-# # RDS PostgreSQL connection parameters
-# host = "database.cfsg8aggwxm9.us-east-1.rds.amazonaws.com"
-# username = "postgres"
-# password = "Sbikrc21916"
-# database = "postgres"
-
-# def on_connect(client, userdata, flags, rc):
-#     print("Connected with result code "+str(rc))
-#     client.subscribe("test1234")
-
-# def on_message(client, userdata, msg):
-#     print(msg.topic+" "+str(msg.payload))
-#     iot_message = json.loads(msg.payload)
-    
-#     id = iot_message.get('id')
-#     name = iot_message.get('name')
-#     location = iot_message.get('location')
-#     data = iot_message.get('data')
-    
-#     if id is None or name is None or location is None or data is None:
-#         print("Missing required fields in the IoT message.")
-#         return
-    
-#     try:
-#         conn = psycopg2.connect(
-#             host=host,
-#             database=database,
-#             user=username,
-#             password=password
-#         )
-#         cur = conn.cursor()
-        
-#         insert_query = """
-#         INSERT INTO public.people (id, name, location, data) 
-#         VALUES (%s, %s, %s, %s)
-#         """
-#         cur.execute(insert_query, (id, name, location, data))
-#         conn.commit()
-#         cur.close()
-#         conn.close()
-#         print("Data inserted successfully.")
-#     except Exception as e:
-#         print(f"Failed to connect to the database: {e}")
-
-# client = mqtt.Client()
-# client.on_connect = on_connect
-# client.on_message = on_message
-
-# client.connect("a1zpb2m9wn3lmq-ats.iot.us-east-1.amazonaws.com", 1883, 60)
-# client.loop_forever()
-
-
-
-
-
 import json
 import psycopg2
 import paho.mqtt.client as mqtt # type: ignore
@@ -74,14 +15,25 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.payload))
+
+    message = msg.payload.decode()  # Decode bytes to string
+    print(f"Received message: {message}")
+
     iot_message = json.loads(msg.payload)
+    print(type(iot_message))
     
-    id = iot_message.get('id')
-    name = iot_message.get('name')
-    location = iot_message.get('location')
-    data = iot_message.get('data')
+    # id = iot_message.get('id')
+    # name = iot_message.get('name')
+    # location = iot_message.get('location')
+    # data = iot_message.get('data')
+
+
+
+
+
+    value =iot_message.get('text')
     
-    if id is None or name is None or location is None or data is None:
+    if value is None:
         print("Missing required fields in the IoT message.")
         return
     
@@ -95,10 +47,10 @@ def on_message(client, userdata, msg):
         cur = conn.cursor()
         
         insert_query = """
-        INSERT INTO public.people (id, name, location, data) 
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO sensor (value) 
+        VALUES (%s)
         """
-        cur.execute(insert_query, (id, name, location, data))
+        cur.execute(insert_query, (value,))
         conn.commit()
         cur.close()
         conn.close()
