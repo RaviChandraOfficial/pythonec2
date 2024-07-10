@@ -1,7 +1,9 @@
+
+
+
 import json
 import psycopg2
-import paho.mqtt.client as mqtt # type: ignore
-# from gmqtt import Client as MQTTClient # type: ignore
+import paho.mqtt.client as mqtt
 
 # RDS PostgreSQL connection parameters
 host = "database.cfsg8aggwxm9.us-east-1.rds.amazonaws.com"
@@ -22,18 +24,10 @@ def on_message(client, userdata, msg):
     iot_message = json.loads(msg.payload)
     print(type(iot_message))
     
-    # id = iot_message.get('id')
-    # name = iot_message.get('name')
-    # location = iot_message.get('location')
-    # data = iot_message.get('data')
-
-
-
-
-
-    value =iot_message.get('text')
+    sensor_id = iot_message.get('sensor_id')
+    value = iot_message.get('value')
     
-    if value is None:
+    if sensor_id is None or value is None:
         print("Missing required fields in the IoT message.")
         return
     
@@ -47,10 +41,11 @@ def on_message(client, userdata, msg):
         cur = conn.cursor()
         
         insert_query = """
-        INSERT INTO sensor (value) 
-        VALUES (%s)
+        INSERT INTO sensor (sensor_id, value) 
+        VALUES (%s, %s)
         """
-        cur.execute(insert_query, (value,))
+        cur.execute(insert_query, (sensor_id, value))
+
         conn.commit()
         cur.close()
         conn.close()
@@ -63,9 +58,9 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # Set the path to your CA certificate, client certificate, and private key
-ca_path = "/home/ubuntu/pythonec2/AmazonRootCA1.pem"
-cert_path = "/home/ubuntu/pythonec2/4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-certificate.pem.crt"
-key_path = "/home/ubuntu/pythonec2/4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-private.pem.key"
+ca_path = "/home/ravi/ECL2 Projects/project yashwanth/pythonec2/AmazonRootCA1.pem"
+cert_path = "/home/ravi/ECL2 Projects/project yashwanth/pythonec2/4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-certificate.pem.crt"
+key_path = "/home/ravi/ECL2 Projects/project yashwanth/pythonec2/4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-private.pem.key"
 
 client.tls_set(ca_certs=ca_path, certfile=cert_path, keyfile=key_path)
 
