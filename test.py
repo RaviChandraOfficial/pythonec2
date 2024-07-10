@@ -1,6 +1,5 @@
 
 
-
 import json
 import psycopg2
 import paho.mqtt.client as mqtt
@@ -58,9 +57,9 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # Set the path to your CA certificate, client certificate, and private key
-ca_path = "/home/ravi/ECL2 Projects/project yashwanth/pythonec2/AmazonRootCA1.pem"
-cert_path = "/home/ravi/ECL2 Projects/project yashwanth/pythonec2/4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-certificate.pem.crt"
-key_path = "/home/ravi/ECL2 Projects/project yashwanth/pythonec2/4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-private.pem.key"
+ca_path = "AmazonRootCA1.pem"
+cert_path = "4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-certificate.pem.crt"
+key_path = "4fcec45f0562bdfe59fd9b02e6930d2bc7258358d968dd28afcb4044dd8a1c3d-private.pem.key"
 
 client.tls_set(ca_certs=ca_path, certfile=cert_path, keyfile=key_path)
 
