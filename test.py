@@ -1,5 +1,3 @@
-
-
 import json
 import psycopg2
 import paho.mqtt.client as mqtt
@@ -23,27 +21,30 @@ def on_message(client, userdata, msg):
     iot_message = json.loads(msg.payload)
     print(type(iot_message))
     
+    name = iot_message.get('name')
+    count = iot_message.get('count')
     sensor_id = iot_message.get('sensor_id')
     value = iot_message.get('value')
     
-    if sensor_id is None or value is None:
+    if sensor_id is None or value is None or count is None or username is None:
         print("Missing required fields in the IoT message.")
         return
     
     try:
+        # Connect to the PostgreSQL database using fixed credentials
         conn = psycopg2.connect(
             host=host,
             database=database,
-            user=username,
+            user=username,  # This should be the correct database username
             password=password
         )
         cur = conn.cursor()
         
         insert_query = """
-        INSERT INTO sensor (sensor_id, value) 
-        VALUES (%s, %s)
+        INSERT INTO sensor (sensor_id, value, count, name) 
+        VALUES (%s, %s, %s, %s)
         """
-        cur.execute(insert_query, (sensor_id, value))
+        cur.execute(insert_query, (sensor_id, value, count, name))
 
         conn.commit()
         cur.close()
@@ -66,3 +67,11 @@ client.tls_set(ca_certs=ca_path, certfile=cert_path, keyfile=key_path)
 # Replace 'your-iot-endpoint.amazonaws.com' with your actual AWS IoT endpoint
 client.connect("a1zpb2m9wn3lmq-ats.iot.us-east-1.amazonaws.com", 8883, 60)
 client.loop_forever()
+
+
+
+
+
+
+
+
