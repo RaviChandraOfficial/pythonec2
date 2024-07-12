@@ -26,16 +26,23 @@ def on_message(client, userdata, msg):
     sensor_id = iot_message.get('sensor_id')
     value = iot_message.get('value')
     
-    if sensor_id is None or value is None or count is None or username is None:
+    if sensor_id is None or value is None or count is None or name is None:
         print("Missing required fields in the IoT message.")
         return
     
+    try:
+        sensor_id = int(sensor_id)  # Convert sensor_id to integer
+        count = int(count)  # Convert count to integer
+    except ValueError:
+        print("Invalid sensor_id or count format. They must be integers.")
+        return
+
     try:
         # Connect to the PostgreSQL database using fixed credentials
         conn = psycopg2.connect(
             host=host,
             database=database,
-            user=username,  # This should be the correct database username
+            user=username,
             password=password
         )
         cur = conn.cursor()
@@ -67,11 +74,3 @@ client.tls_set(ca_certs=ca_path, certfile=cert_path, keyfile=key_path)
 # Replace 'your-iot-endpoint.amazonaws.com' with your actual AWS IoT endpoint
 client.connect("a1zpb2m9wn3lmq-ats.iot.us-east-1.amazonaws.com", 8883, 60)
 client.loop_forever()
-
-
-
-
-
-
-
-
